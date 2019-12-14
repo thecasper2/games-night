@@ -1,0 +1,36 @@
+version: "2.0"
+
+services:
+  shiny:
+    container_name: shiny-test
+    image: rocker/shiny-verse
+    restart: always
+    user: 'root'
+    ports:
+      - '5001:3838'
+    volumes:
+      - './shiny_logs:/var/log/shiny-server'
+      #- './apps:/srv/shiny-server/apps'
+      #- './config_files/keytab:/home/shiny/keytab'
+      #- './config_files/templates:/etc/shiny-server/templates/'
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: adolphin
+    ports:
+      - "3308:3306"
+    volumes:
+      - './my-datavolume:/var/lib/mysql'
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  shiny_logs:
+  my-datavolume:

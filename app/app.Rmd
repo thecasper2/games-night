@@ -1,0 +1,91 @@
+---
+title: "Games Night"
+author: "By Alex Dolphin"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(data.table)
+library(flexdashboard)
+library(ggplot2)
+library(magrittr)
+library(RMySQL)
+library(shiny)
+
+source("get_data.R")
+source("generic_functions.R")
+```
+
+Main
+=======================================================================
+
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+
+```{r selectors}
+events_selector <- setNames(df_events$event_id, df_events$event_name)
+
+shiny::selectInput("selected_event", "Select event", choices = events_selector, multiple = FALSE)
+```
+
+Row
+-----------------------------------------------------------------------
+
+Hello
+
+Admin
+=======================================================================
+
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+
+```{r admin_panel}
+# New user
+shiny::textInput("new_user_first_name", "New user first name", value="Mr")
+shiny::textInput("new_user_last_name", "New user last name", value="Chips")
+shiny::actionButton("submit_new_user", label="Create new user", icon("arrow-cirlce-right"))
+
+## Observe player creation event
+shiny::observeEvent(input$submit_new_user, {
+    if(nchar(input$new_user_first_name) >= 1 & nchar(input$new_user_last_name) >= 1){
+        withProgress(message = 'Creating user', value = 0.5,
+            {
+                create_user(input$new_user_first_name, input$new_user_last_name)
+                shiny::showNotification(
+                    paste0("User '",input$new_user_first_name, " ", input$new_user_last_name,"' created!")
+                )
+            }
+        )
+    }
+    else {shiny::showNotification("Name is too short!")}
+})
+
+# New event
+players_selector <- setNames(df_players$player_id, paste(df_players$first_name, df_players$last_name))
+
+shiny::textInput("new_event_name", "New event name", value="Party")
+shiny::selectInput(
+    "new_event_players",
+    "Select event players",
+    choices = players_selector,
+    multiple = TRUE
+)
+shiny::actionButton("submit_new_event", label="Create new event", icon("arrow-cirlce-right"))
+
+## Observe event creation event
+shiny::observeEvent(input$submit_new_event, {
+    if(length(input$new_event_players > 1)){
+        withProgress(message = 'Creating event', value = 0.5,
+            {
+                create_event(input$new_event_name, input$new_event_players)
+                shiny::showNotification(paste0("Event '", input$new_event_name,"' created!"))
+            }
+        )
+    }
+    else {shiny::showNotification("Too few players!")}
+})
+```
+
