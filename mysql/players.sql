@@ -1,12 +1,12 @@
-DROP TABLE IF EXISTS event_players;
-DROP TABLE IF EXISTS event;
-DROP TABLE IF EXISTS player;
 DROP TABLE IF EXISTS fifa_results;
 DROP TABLE IF EXISTS rps_results;
 DROP TABLE IF EXISTS headers_and_volleys_results;
 DROP TABLE IF EXISTS ticket_to_ride_results;
 DROP TABLE IF EXISTS catan_results;
 DROP TABLE IF EXISTS ctr_results;
+DROP TABLE IF EXISTS event_players;
+DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS player;
 
 CREATE TABLE player (
     player_id INT NOT NULL AUTO_INCREMENT,
@@ -44,7 +44,7 @@ CREATE TABLE fifa_results (
 );
 
 CREATE TABLE rps_results (
-    match_id INT NOT NULL,
+    match_id INT NOT NULL AUTO_INCREMENT,
     event_id INT NOT NULL,
     home_player_id INT NOT NULL,
     away_player_id INT NOT NULL,
@@ -80,7 +80,6 @@ CREATE TABLE catan_results (
     match_id INT NOT NULL,
     event_id INT NOT NULL,
     player_id INT NOT NULL,
-    position INT NOT NULL,
     victory_points INT NOT NULL,
     FOREIGN KEY (event_id)  REFERENCES event (event_id) ON DELETE CASCADE,
     FOREIGN KEY (player_id) REFERENCES player (player_id) ON DELETE CASCADE,
