@@ -16,7 +16,6 @@ library(RMySQL)
 library(shiny)
 
 source("get_data.R")
-source("generic_functions.R")
 ```
 
 
