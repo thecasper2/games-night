@@ -32,10 +32,20 @@ events_selector <- setNames(df_events$event_id, df_events$event_name)
 shiny::selectInput("selected_event", "Select event", choices = events_selector, multiple = FALSE)
 ```
 
-Row
+Row {.tabset}
 -----------------------------------------------------------------------
 
-Hello
+### FIFA
+
+### Headers and Volleys
+
+### Catan
+
+### CTR
+
+### Ticket to Ride
+
+### Rock Paper Scissors
 
 Update Results
 =======================================================================
@@ -67,6 +77,8 @@ Row {.tabset}
 ### CTR
 
 ### Ticket to Ride
+
+### Rock Paper Scissors
 
 Admin
 =======================================================================
