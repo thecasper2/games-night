@@ -19,13 +19,14 @@ source("get_data.R")
 source("generic_functions.R")
 ```
 
+
 Main
 =======================================================================
 
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
 
-```{r selectors}
+```{r main_selectors}
 events_selector <- setNames(df_events$event_id, df_events$event_name)
 
 shiny::selectInput("selected_event", "Select event", choices = events_selector, multiple = FALSE)
@@ -35,6 +36,37 @@ Row
 -----------------------------------------------------------------------
 
 Hello
+
+Update Results
+=======================================================================
+
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+
+Please select your event from the main tab
+
+```{r update_results}
+actionButton("update_results", label="Submit new results", icon("refresh"))
+
+shiny::observeEvent(input$update_results, {
+      withProgress(message = 'Creating event', value = 0.5, {})
+      shiny::showNotification("Results updated!")
+})
+```
+
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### FIFA
+
+### Headers and Volleys
+
+### Catan
+
+### CTR
+
+### Ticket to Ride
 
 Admin
 =======================================================================
@@ -46,7 +78,7 @@ Sidebar {.sidebar}
 # New user
 shiny::textInput("new_user_first_name", "New user first name", value="Mr")
 shiny::textInput("new_user_last_name", "New user last name", value="Chips")
-shiny::actionButton("submit_new_user", label="Create new user", icon("arrow-cirlce-right"))
+shiny::actionButton("submit_new_user", label="Create new user", icon("refresh"))
 
 ## Observe player creation event
 shiny::observeEvent(input$submit_new_user, {
@@ -73,7 +105,7 @@ shiny::selectInput(
     choices = players_selector,
     multiple = TRUE
 )
-shiny::actionButton("submit_new_event", label="Create new event", icon("arrow-cirlce-right"))
+shiny::actionButton("submit_new_event", label="Create new event", icon("refresh"))
 
 ## Observe event creation event
 shiny::observeEvent(input$submit_new_event, {
