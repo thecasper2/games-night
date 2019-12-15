@@ -20,7 +20,7 @@ source("get_data.R")
 ```
 
 
-Main
+Summary
 =======================================================================
 
 Sidebar {.sidebar}
@@ -38,7 +38,7 @@ Row {.tabset}
 ```{r output_results, message=FALSE, warning=FALSE, include=FALSE}
 lapply(games, function(game){
     output[[game]] <- renderDataTable({
-        results[[game]][df_players, on="player_id"][event_id == input$selected_event][order(-event_points)][,-c("event_id", "player_id")]
+        results[[game]][df_players, on="player_id"][event_id == input$selected_event][order(-event_points)][,-c("event_id", "player_id", "first_name", "last_name")]
     })
 })
 ```
@@ -48,7 +48,7 @@ lapply(games, function(game){
 ```{r final_results}
 output$final_results_plot <- renderPlot({
     plot_data <- final_results[event_id == input$selected_event]
-    ggplot(plot_data, aes(x=as.factor(player_id), y=event_points, fill=game_name)) +
+    ggplot(plot_data, aes(x=full_name, y=event_points, fill=game_name)) +
         geom_bar(stat = "identity", position = "stack") +
         theme_bw() +
         labs(x="Player", y="Points", fill="Game")

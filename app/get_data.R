@@ -2,6 +2,7 @@ source("mysql_functions.R")
 
 # Generic data
 df_players <- query("select * from player;")
+df_players[, full_name := paste(first_name, last_name)]
 df_events <- query("select * from event;")
 df_event_players <- query("select * from event_players;")
 
@@ -25,4 +26,4 @@ results <- list(
     ctr = multiplayer_results(raw_results[["ctr"]], metric="position", positive = "low")
 )
 
-final_results <- create_final_results(results)
+final_results <- create_final_results(results)[df_players, on="player_id"][,-c("first_name", "last_name")]
