@@ -62,9 +62,17 @@ multiplayer_results <- function(df_results, metric="position", positive="low"){
 
 merge_results <- function(x, y){
     # Take two results tables and combine them to get total event points
-    x <- x[, c("event_id", "player_id", "event_points")]
-    y <- y[, c("event_id", "player_id", "event_points")]
+    x <- x[, c("event_id", "player_id", "event_points", "game_name")]
+    y <- y[, c("event_id", "player_id", "event_points", "game_name")]
     z <- rbind(x, y)
-    z <- z[, .(event_points = sum(event_points)), by=.(event_id, player_id)]
+    #z <- z[, .(event_points = sum(event_points)), by=.(event_id, player_id)]
     return(z)
+}
+
+create_final_results <- function(results){
+    for(name in names(results)){
+        results[[name]][["game_name"]] <- name
+    }
+    final_results <- Reduce(merge_results, results)[order(event_id, -event_points)]
+    return(final_results)
 }

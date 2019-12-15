@@ -25,4 +25,4 @@ results <- list(
     ctr = multiplayer_results(raw_results[["ctr"]], metric="position", positive = "low")
 )
 
-total_results <- Reduce(merge_results, results)[order(event_id, -event_points)]
+final_results <- create_final_results(results)
