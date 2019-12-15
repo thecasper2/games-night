@@ -7,8 +7,22 @@ df_event_players <- query("select * from event_players;")
 
 # Games data
 games <- c("fifa", "rps", "headers_and_volleys", "ticket_to_ride", "catan", "ctr")
-results <- list()
+raw_results <- list()
 
 for(game in games){
-    results[[game]] <- "select * from {game}_results;" %>% glue %>% query
+    raw_results[[game]] <- "select * from {game}_results;" %>% glue %>% query
 }
+
+# Transform raw results to scored results
+source("transform_functions.R")
+
+results <- list(
+    fifa = head2head_results(raw_results[["fifa"]], metric="goals"),
+    rps = head2head_results(raw_results[["rps"]], metric="wins"),
+    headers_and_volleys = multiplayer_results(raw_results[["headers_and_volleys"]], metric="position", positive = "low"),
+    ticket_to_ride = multiplayer_results(raw_results[["ticket_to_ride"]], metric="position", positive = "low"),
+    catan = multiplayer_results(raw_results[["catan"]], metric="victory_points", positive = "high"),
+    ctr = multiplayer_results(raw_results[["ctr"]], metric="position", positive = "low")
+)
+
+total_results <- Reduce(merge_results, results)[order(event_id, -event_points)]
