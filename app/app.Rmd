@@ -45,6 +45,18 @@ lapply(games, function(game){
 
 ### Overview
 
+```{r final_results}
+output$final_results_plot <- renderPlot({
+    plot_data <- final_results[event_id == input$selected_event]
+    ggplot(plot_data, aes(x=as.factor(player_id), y=event_points, fill=game_name)) +
+        geom_bar(stat = "identity", position = "stack") +
+        theme_bw() +
+        labs(x="Player", y="Points", fill="Game")
+})
+plotOutput("final_results_plot")
+```
+
+
 ### FIFA
 
 ```{r fifa_results}
