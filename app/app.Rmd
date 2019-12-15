@@ -35,17 +35,51 @@ shiny::selectInput("selected_event", "Select event", choices = events_selector, 
 Row {.tabset}
 -----------------------------------------------------------------------
 
+```{r output_results, message=FALSE, warning=FALSE, include=FALSE}
+lapply(games, function(game){
+    output[[game]] <- renderDataTable({
+        results[[game]][df_players, on="player_id"][event_id == input$selected_event][order(-event_points)][,-c("event_id", "player_id")]
+    })
+})
+```
+
+### Overview
+
 ### FIFA
+
+```{r fifa_results}
+dataTableOutput("fifa")
+```
 
 ### Headers and Volleys
 
+```{r headers_and_volleys_results}
+dataTableOutput("headers_and_volleys")
+```
+
 ### Catan
+
+```{r catan_results}
+dataTableOutput("catan")
+```
 
 ### CTR
 
+```{r ctr_results}
+dataTableOutput("ctr")
+```
+
 ### Ticket to Ride
 
+```{r ticket_to_ride_results}
+dataTableOutput("ticket_to_ride")
+```
+
 ### Rock Paper Scissors
+
+```{r rps_results}
+dataTableOutput("rps")
+```
 
 Update Results
 =======================================================================
