@@ -93,39 +93,6 @@ dataTableOutput("ticket_to_ride")
 dataTableOutput("rps")
 ```
 
-Update Results
-=======================================================================
-
-Sidebar {.sidebar}
------------------------------------------------------------------------
-
-Please select your event from the main tab
-
-```{r update_results}
-actionButton("update_results", label="Submit new results", icon("refresh"))
-
-shiny::observeEvent(input$update_results, {
-      withProgress(message = 'Creating event', value = 0.5, {})
-      shiny::showNotification("Results updated!")
-})
-```
-
-
-Row {.tabset}
------------------------------------------------------------------------
-
-### FIFA
-
-### Headers and Volleys
-
-### Catan
-
-### CTR
-
-### Ticket to Ride
-
-### Rock Paper Scissors
-
 Admin
 =======================================================================
 
