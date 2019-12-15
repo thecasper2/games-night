@@ -1,4 +1,4 @@
-source("mysql.R")
+source("mysql_functions.R")
 
 # Generic data
 df_players <- query("select * from player;")
