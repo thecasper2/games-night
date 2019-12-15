@@ -15,6 +15,7 @@ library(magrittr)
 library(RMySQL)
 library(shiny)
 
+games <- c("fifa", "rps", "headers_and_volleys", "ticket_to_ride", "catan", "ctr")
 source("get_data.R")
 ```
 
