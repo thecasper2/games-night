@@ -68,6 +68,8 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
+    source("validation_functions.R")
+
     # Get data reactives
     withProgress(message = "Connecting to server...", value = 0.5, {
         data <- reactiveValues(
@@ -99,7 +101,7 @@ server <- function(input, output) {
                 )
             })
         }
-        else {showNotification("Name is too short!")}
+        else {showNotification("Name is too short!", type="error")}
     })
     
     observeEvent(input$submit_new_event, {
@@ -108,11 +110,11 @@ server <- function(input, output) {
                 create_event(input$new_event_name, input$new_event_players)
                 data$events <- query("select * from event;")
                 data$event_players <- query("select * from event_players;")
-                showNotification(paste0("Event '", input$new_event_name,"' created!"))
+                ication(paste0("Event '", input$new_event_name,"' created!"))
             })
         }
-        else if (nchar(input$new_event_name) <= 0){showNotification("Event name too short!")}
-        else {showNotification("Event has too few players!")}
+        else if (nchar(input$new_event_name) <= 0){showNotification("Event name too short!", type="error")}
+        else {showNotification("Event has too few players!", type="error")}
     })
 
     # Eligible players
@@ -130,7 +132,7 @@ server <- function(input, output) {
             "fifa_player_1",
             "Select first player",
             choices = eligible_players(),
-            multiple = TRUE
+            multiple = FALSE
         )
     })
     output$fifa_score_1 <- renderUI({
@@ -141,11 +143,15 @@ server <- function(input, output) {
             "fifa_player_2",
             "Select second player",
             choices = eligible_players(),
-            multiple = TRUE
+            multiple = FALSE
         )
     })
     output$fifa_score_2 <- renderUI({
         numericInput("fifa_score_2", "Second player score", value=0, min=0, step=1)
+    })
+    observeEvent(input$submit_fifa_results, {
+        pass <- validate_head_to_head("fifa", input)
+        if(pass){showNotification("Results submitted!")}
     })
 
     # Headers and Volleys
@@ -157,8 +163,13 @@ server <- function(input, output) {
             multiple = TRUE
         )
     })
+    observeEvent(input$submit_headers_and_volleys_results, {
+        pass <- validate_position("headers_and_volleys", input)
+        if(pass){showNotification("Results submitted!")}
+    })
 
     # Catan
+
     # CTR
     output$ctr_results_selector <- renderUI({
         selectInput(
@@ -168,6 +179,11 @@ server <- function(input, output) {
             multiple = TRUE
         )
     })
+    observeEvent(input$submit_ctr_results, {
+        pass <- validate_position("ctr", input)
+        if(pass){showNotification("Results submitted!")}
+    })
+
     # Ticket to ride
     output$ticket_to_ride_results_selector <- renderUI({
         selectInput(
@@ -177,13 +193,18 @@ server <- function(input, output) {
             multiple = TRUE
         )
     })
+    observeEvent(input$submit_ticket_to_ride_results, {
+        pass <- validate_position("ticket_to_ride", input)
+        if(pass){showNotification("Results submitted!")}
+    })
+
     # Rock Paper Scissors
     output$rps_player_1 <- renderUI({
         selectInput(
             "rps_player_1",
             "Select first player",
             choices = eligible_players(),
-            multiple = TRUE
+            multiple = FALSE
         )
     })
     output$rps_score_1 <- renderUI({
@@ -194,11 +215,15 @@ server <- function(input, output) {
             "rps_player_2",
             "Select second player",
             choices = eligible_players(),
-            multiple = TRUE
+            multiple = FALSE
         )
     })
     output$rps_score_2 <- renderUI({
         numericInput("rps_score_2", "Second player score", value=0, min=0, step=1)
+    })
+    observeEvent(input$submit_rps_results, {
+        pass <- validate_head_to_head("rps", input)
+        if(pass){showNotification("Results submitted!")}
     })
 }
 
