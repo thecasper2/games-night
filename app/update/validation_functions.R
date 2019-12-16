@@ -1,4 +1,5 @@
 library(glue)
+library(magrittr)
 
 validate_head_to_head <- function(game, input){
     inputs <- list(

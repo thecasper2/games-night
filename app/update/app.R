@@ -69,6 +69,7 @@ ui <- fluidPage(
 
 server <- function(input, output) {
     source("validation_functions.R")
+    source("submit_functions.R")
 
     # Get data reactives
     withProgress(message = "Connecting to server...", value = 0.5, {
@@ -165,7 +166,10 @@ server <- function(input, output) {
     })
     observeEvent(input$submit_headers_and_volleys_results, {
         pass <- validate_position("headers_and_volleys", input)
-        if(pass){showNotification("Results submitted!")}
+        if(pass){
+            submit_position("headers_and_volleys", input)
+            showNotification("Results submitted!")
+        }
     })
 
     # Catan
@@ -181,7 +185,10 @@ server <- function(input, output) {
     })
     observeEvent(input$submit_ctr_results, {
         pass <- validate_position("ctr", input)
-        if(pass){showNotification("Results submitted!")}
+        if(pass){
+            submit_position("ctr", input)
+            showNotification("Results submitted!")
+        }
     })
 
     # Ticket to ride
@@ -195,7 +202,10 @@ server <- function(input, output) {
     })
     observeEvent(input$submit_ticket_to_ride_results, {
         pass <- validate_position("ticket_to_ride", input)
-        if(pass){showNotification("Results submitted!")}
+        if(pass){
+            submit_position("ticket_to_ride", input)
+            showNotification("Results submitted!")
+        }
     })
 
     # Rock Paper Scissors
