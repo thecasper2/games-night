@@ -65,13 +65,10 @@ get_next_match_id <- function(game){
     return(id[[1]] + 1)
 }
 
-submit_results <- function(variables_string, value_string, game, increment_match_id=FALSE){
+submit_results <- function(variables_string, values_string, game){
     # Submits results to a results table. Requires:
     # variables_string: a string of comma separated column names to update
     # values_string: a string of comma separated values for the columns.
-    # NOTE if the match_id needs to be incremented, then you can submit the value {match_id}
-    # and set increment_match_id=TRUE, so that the match_id is retrieved and glued.
-    if(increment_match_id){match_id <- get_next_match_id(game)}
     "INSERT INTO {game}_results ({variables_string}) VALUES ({values_string})" %>%
         glue %>% glue %>% query(data=FALSE)
 }
