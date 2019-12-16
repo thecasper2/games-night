@@ -13,14 +13,14 @@ CREATE TABLE player (
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     PRIMARY KEY (player_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE event (
     event_id INT NOT NULL AUTO_INCREMENT,
     creation_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     event_name VARCHAR(100) NOT NULL,
     PRIMARY KEY (event_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE event_players (
     event_id INT NOT NULL,
