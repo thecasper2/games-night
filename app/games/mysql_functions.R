@@ -65,7 +65,7 @@ get_next_match_id <- function(game){
     return(id[[1]] + 1)
 }
 
-submit_results <- function(variables_string, values_string, game){
+submit_results_mysql <- function(variables_string, values_string, game){
     # Submits results to a results table. Requires:
     # variables_string: a string of comma separated column names to update
     # values_string: a string of comma separated values for the columns.
