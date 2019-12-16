@@ -72,7 +72,7 @@ ui <- fluidPage(
                         uiOutput("rps_player_2"),
                         uiOutput("rps_score_2")
                     ),
-                    actionButton("ps_results", label="Submit results", icon("refresh")),
+                    actionButton("submit_rps_results", label="Submit results", icon("refresh")),
                     hr(),
                     dataTableOutput("rps_results_table")
                 )
@@ -114,7 +114,7 @@ server <- function(input, output, session) {
         player_options <- setNames(data$players$player_id, paste(data$players$first_name, data$players$last_name))
         selectInput("new_event_players", "Select event players", choices = player_options, multiple = TRUE)
     })
-    
+
     # Create new events and players
     observeEvent(input$submit_new_user, {
         if(nchar(input$new_user_first_name) >= 1 & nchar(input$new_user_last_name) >= 1){
@@ -151,6 +151,44 @@ server <- function(input, output, session) {
         return(opts)
     })
 
+    # Create submit actions for all games
+    games <- list(
+        fifa = list(name="fifa", style="h2h", metric="goals"),
+        rps = list(name="rps", style="h2h", metric="wins"),
+        headers_and_volleys = list(name="headers_and_volleys", style="position", metric=NULL),
+        ticket_to_ride = list(name="ticket_to_ride", style="position", metric=NULL),
+        #catan = list(game="catan", style="position", metric=NULL),
+        ctr = list(name="ctr", style="position", metric=NULL)
+    )
+
+    create_submit <- function(game){
+        # Creates the two observe events:
+        # 1) Check the validity of the entry, then give the user a confirmation popup
+        # 2) On confirm, submit results, update table and show notification
+        vars <- games[[game]]
+        observeEvent(input[[paste0("submit_", vars$name, "_results")]], {
+            pass <- validate_data(game=vars$name, style=vars$style, input)
+            if(pass){
+                confirmSweetAlert(
+                    session = session,
+                    inputId = paste0(vars$name, "_submit_confirm"),
+                    type = "warning",
+                    title = "Submit results?"
+                )
+            }
+        })
+        observeEvent(input[[paste0(vars$name,"_submit_confirm")]], {
+            if(isTRUE(input[[paste0(vars$name,"_submit_confirm")]])){
+                submit_results(game=vars$name, style=vars$style, metric=vars$metric, input)
+                results[[vars$name]] <- get_results(vars$name, vars$style)
+                showNotification("Results submitted!")
+            }
+        })
+    }
+
+    # Loop to create submits
+    lapply(names(games), FUN = create_submit)
+
     # FIFA
     output$fifa_player_1 <- renderUI({
         selectInput(
@@ -174,25 +212,6 @@ server <- function(input, output, session) {
     output$fifa_score_2 <- renderUI({
         numericInput("fifa_score_2", "Second player score", value=0, min=0, step=1)
     })
-    ## submit
-    observeEvent(input$submit_fifa_results, {
-        pass <- validate_data("fifa", "h2h", input)
-        if(pass){
-            confirmSweetAlert(
-                session = session,
-                inputId = "fifa_submit_confirm",
-                type = "warning",
-                title = "Submit FIFA results?"
-            )
-        }
-    })
-    observeEvent(input$fifa_submit_confirm, {
-        if(isTRUE(input$fifa_submit_confirm)){
-                submit_results(game="fifa", style="h2h", metric="goals", input=input)
-                results$fifa <- get_results("fifa", "h2h")
-                showNotification("Results submitted!")
-        }
-    })
     ## table
     output$fifa_results_table <- renderDataTable({
         results$fifa[event_id == input$selected_event][,-c("event_id")][order(-match_id)]
@@ -206,25 +225,6 @@ server <- function(input, output, session) {
             choices = eligible_players(),
             multiple = TRUE
         )
-    })
-    ## submit
-    observeEvent(input$submit_headers_and_volleys_results, {
-        pass <- validate_data("headers_and_volleys", "position", input)
-        if(pass){
-            confirmSweetAlert(
-                session = session,
-                inputId = "headers_and_volleys_submit_confirm",
-                type = "warning",
-                title = "Submit Headers and Volleys results?"
-            )
-        }
-    })
-    observeEvent(input$headers_and_volleys_submit_confirm, {
-        if(isTRUE(input$headers_and_volleys_submit_confirm)){
-            submit_results(game="headers_and_volleys", style="position", input=input)
-            results$headers_and_volleys <- get_results("headers_and_volleys", "position")
-            showNotification("Results submitted!")
-        }
     })
     ## table
     output$headers_and_volleys_results_table <- renderDataTable({
@@ -246,25 +246,6 @@ server <- function(input, output, session) {
             multiple = TRUE
         )
     })
-    ## submit
-    observeEvent(input$submit_ctr_results, {
-        pass <- validate_data("ctr", "position", input)
-        if(pass){
-            confirmSweetAlert(
-                session = session,
-                inputId = "ctr_submit_confirm",
-                type = "warning",
-                title = "Submit CTR results?"
-            )
-        }
-    })
-    observeEvent(input$ctr_submit_confirm, {
-        if(isTRUE(input$ctr_submit_confirm)){
-            submit_results(game="ctr", style="position", input=input)
-            results$ctr <- get_results("ctr", "position")
-            showNotification("Results submitted!")
-        }
-    })
     ## table
     output$ctr_results_table <- renderDataTable({
         results$ctr[event_id == input$selected_event][,-c("event_id")][order(-match_id, position)]
@@ -278,25 +259,6 @@ server <- function(input, output, session) {
             choices = eligible_players(),
             multiple = TRUE
         )
-    })
-    ## submit
-    observeEvent(input$submit_ticket_to_ride_results, {
-        pass <- validate_data("ticket_to_ride", "position", input)
-        if(pass){
-            confirmSweetAlert(
-                session = session,
-                inputId = "ticket_to_ride_submit_confirm",
-                type = "warning",
-                title = "Submit Ticket to Ride results?"
-            )
-        }
-    })
-    observeEvent(input$ticket_to_ride_submit_confirm, {
-        if(isTRUE(input$ticket_to_ride_submit_confirm)){
-            submit_results(game="ticket_to_ride", style="position", input=input)
-            results$ticket_to_ride <- get_results("ticket_to_ride", "position")
-            showNotification("Results submitted!")
-        }
     })
     ## table
     output$ticket_to_ride_results_table <- renderDataTable({
@@ -325,25 +287,6 @@ server <- function(input, output, session) {
     })
     output$rps_score_2 <- renderUI({
         numericInput("rps_score_2", "Second player score", value=0, min=0, step=1)
-    })
-    ## submit
-    observeEvent(input$submit_rps_results, {
-        pass <- validate_data("rps", "h2h", input)
-        if(pass){
-            confirmSweetAlert(
-                session = session,
-                inputId = "rps_submit_confirm",
-                type = "warning",
-                title = "Submit Rock Paper Scissors results?"
-            )
-        }
-    })
-    observeEvent(input$rps_submit_confirm, {
-        if(isTRUE(input$rps_submit_confirm)){
-            submit_results(game="rps", style="h2h", metric="wins", input)
-            results$rps <- get_results("rps", "h2h")
-            showNotification("Results submitted!")
-        }
     })
     ## table
     output$rps_results_table <- renderDataTable({
