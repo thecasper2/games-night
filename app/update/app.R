@@ -74,7 +74,10 @@ server <- function(input, output, session) {
     source("submit_functions.R")
     source("result_functions.R")
 
+    #####################
     # Get data reactives
+    #####################
+
     withProgress(message = "Getting data", value = 0.5, {
         data <- reactiveValues(
             players = query("select * from player;"),
@@ -91,8 +94,11 @@ server <- function(input, output, session) {
             rps = get_results("rps", "h2h")
         )
     })
-    
+
+    ##############################################
     # Create selectors for new events and players
+    ##############################################
+
     output$event_selector <- renderUI({
         event_options <- setNames(data$events$event_id, data$events$event_name)
         selectInput("selected_event", "Select event", choices = event_options, multiple = FALSE)
@@ -103,7 +109,10 @@ server <- function(input, output, session) {
         selectInput("new_event_players", "Select event players", choices = player_options, multiple = TRUE)
     })
 
+    ################################
     # Create new events and players
+    ################################
+
     observeEvent(input$submit_new_user, {
         if(nchar(input$new_user_first_name) >= 1 & nchar(input$new_user_last_name) >= 1){
             withProgress(message = 'Creating user', value = 0.5,{
@@ -130,7 +139,10 @@ server <- function(input, output, session) {
         else {showNotification("Event has too few players!", type="error")}
     })
 
+    ###################
     # Eligible players
+    ###################
+
     eligible_players <- reactive({
         req(input$selected_event)
         p <- data$event_players[event_id == input$selected_event]
@@ -139,7 +151,10 @@ server <- function(input, output, session) {
         return(opts)
     })
 
-    # Create submit actions for all games
+    ###################
+    # Games parameters
+    ###################
+
     games <- list(
         fifa = list(name="fifa", style="h2h", metric="goals", order_cols=c("match_id")),
         rps = list(name="rps", style="h2h", metric="wins", order_cols=c("match_id")),
@@ -148,6 +163,10 @@ server <- function(input, output, session) {
         #catan = list(game="catan", style="position", metric=NULL, order_cols=c("match_id", "victory_points")),
         ctr = list(name="ctr", style="position", metric=NULL, order_cols=c("match_id", "position"))
     )
+
+    ###################
+    # Create functions
+    ###################
 
     create_submit <- function(game){
         # Creates the two observe events:
@@ -175,100 +194,64 @@ server <- function(input, output, session) {
     }
 
     create_table <- function(game){
+        # Creates results tables for each event
         vars <- games[[game]]
         output[[paste0(vars$name, "_results_table")]] <- renderDataTable({
             results[[vars$name]][event_id == input$selected_event][,-c("event_id")][order(-get(vars$order_cols))]
         })
     }
+    
+    create_selectors <- function(game, players){
+        # Creates the selectors required for submitting stuff for each event
+        vars <- games[[game]]
+        if(vars$style == "h2h"){
+            output[[paste0(vars$name, "_player_1")]] <- renderUI({
+                selectInput(
+                    paste0(vars$name, "_player_1"), "Select first player",
+                    choices = eligible_players(), multiple = FALSE
+                )
+            })
+            output[[paste0(vars$name, "_player_2")]] <- renderUI({
+                selectInput(
+                    paste0(vars$name, "_player_2"), "Select second player",
+                    choices = eligible_players(), multiple = FALSE
+                )
+            })
+            output[[paste0(vars$name, "_score_1")]] <- renderUI({
+                numericInput(paste0(vars$name, "_score_1"), "First player score", value=0, min=0, step=1)
+            })
+            output[[paste0(vars$name, "_score_2")]] <- renderUI({
+                numericInput(paste0(vars$name, "_score_2"), "Second player score", value=0, min=0, step=1)
+            })
+        }
+        if(vars$style == "position"){
+            output[[paste0(vars$name, "_results_selector")]] <- renderUI({
+                selectInput(
+                    paste0(vars$name, "_results"), "Select players in order of finishing position",
+                    choices = players(), multiple = TRUE
+                )
+            })
+        }
+    }
 
-    # Loop to create:
+    #################
+    # Creation loops
+    #################
+
     ## Submit actions
     lapply(names(games), FUN = create_submit)
     ## Tables
     lapply(names(games), FUN = create_table)
+    ## Selectors
+    lapply(names(games), FUN = create_selectors, players=eligible_players)
 
-    # FIFA
-    output$fifa_player_1 <- renderUI({
-        selectInput(
-            "fifa_player_1",
-            "Select first player",
-            choices = eligible_players(),
-            multiple = FALSE
-        )
-    })
-    output$fifa_score_1 <- renderUI({
-        numericInput("fifa_score_1", "First player score", value=0, min=0, step=1)
-    })
-    output$fifa_player_2 <- renderUI({
-        selectInput(
-            "fifa_player_2",
-            "Select second player",
-            choices = eligible_players(),
-            multiple = FALSE
-        )
-    })
-    output$fifa_score_2 <- renderUI({
-        numericInput("fifa_score_2", "Second player score", value=0, min=0, step=1)
-    })
-
-    # Headers and Volleys
-    output$headers_and_volleys_results_selector <- renderUI({
-        selectInput(
-            "headers_and_volleys_results",
-            "Select players in order of finishing position",
-            choices = eligible_players(),
-            multiple = TRUE
-        )
-    })
-
+    ########
     # Catan
+    ########
+
     ## table
     output$catan_results_table <- renderDataTable({
         results$catan[event_id == input$selected_event][,-c("event_id")][order(-match_id, victory_points)]
-    })
-
-    # CTR
-    output$ctr_results_selector <- renderUI({
-        selectInput(
-            "ctr_results",
-            "Select players in order of finishing position",
-            choices = eligible_players(),
-            multiple = TRUE
-        )
-    })
-
-    # Ticket to ride
-    output$ticket_to_ride_results_selector <- renderUI({
-        selectInput(
-            "ticket_to_ride_results",
-            "Select players in order of finishing position",
-            choices = eligible_players(),
-            multiple = TRUE
-        )
-    })
-
-    # Rock Paper Scissors
-    output$rps_player_1 <- renderUI({
-        selectInput(
-            "rps_player_1",
-            "Select first player",
-            choices = eligible_players(),
-            multiple = FALSE
-        )
-    })
-    output$rps_score_1 <- renderUI({
-        numericInput("rps_score_1", "First player score", value=0, min=0, step=1)
-    })
-    output$rps_player_2 <- renderUI({
-        selectInput(
-            "rps_player_2",
-            "Select second player",
-            choices = eligible_players(),
-            multiple = FALSE
-        )
-    })
-    output$rps_score_2 <- renderUI({
-        numericInput("rps_score_2", "Second player score", value=0, min=0, step=1)
     })
 }
 
