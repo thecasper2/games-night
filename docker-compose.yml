@@ -3,25 +3,27 @@ version: "2.0"
 services:
   shiny:
     container_name: shiny-test
-    image: rocker/shiny-verse
+    build:
+      context: ./dockerfiles/shiny/
+      dockerfile: Dockerfile
     restart: always
     user: 'root'
     ports:
       - '5001:3838'
     volumes:
       - './shiny_logs:/var/log/shiny-server'
-      #- './apps:/srv/shiny-server/apps'
-      #- './config_files/keytab:/home/shiny/keytab'
-      #- './config_files/templates:/etc/shiny-server/templates/'
+      - './app:/srv/shiny-server/apps'
   db:
     image: mysql
-    command: --default-authentication-plugin=mysql_native_password
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: adolphin
     ports:
-      - "3308:3306"
+      - "3306:3306"
+    expose:
+      - "3306"
     volumes:
       - './my-datavolume:/var/lib/mysql'
 
