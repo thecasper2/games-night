@@ -25,7 +25,8 @@ services:
     expose:
       - "3306"
     volumes:
-      - './my-datavolume:/var/lib/mysql'
+      - './mysql-datavolume:/var/lib/mysql'
+      - './mysql/init.sql:/docker-entrypoint-initdb.d/init.sql'
 
   adminer:
     image: adminer
