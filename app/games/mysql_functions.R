@@ -10,6 +10,7 @@ db_variables <- list(
     host="db",
     port=3306
 )
+if(Sys.getenv("USER") == "adolphin"){db_variables$host <- "127.0.0.1"}
 
 con <- function(db_variables){
     # Creates a connection to a MySQL database
