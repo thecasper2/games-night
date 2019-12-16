@@ -70,9 +70,16 @@ merge_results <- function(x, y){
 }
 
 create_final_results <- function(results){
+    ## Creates a list of final results for games where final results exist.
+    ## If no results exist, then an empty data.table is returned
+    temp_results <- list()
     for(name in names(results)){
-        results[[name]][["game_name"]] <- name
+        if(nrow(results[[name]]) > 0){
+            temp_results[[name]] <- results[[name]]
+            temp_results[[name]][["game_name"]] <- name
+        }
     }
-    final_results <- Reduce(merge_results, results)[order(event_id, -event_points)]
+    if(length(temp_results) == 0){return(data.table())}
+    final_results <- Reduce(merge_results, temp_results)[order(event_id, -event_points)]
     return(final_results)
 }

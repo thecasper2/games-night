@@ -47,11 +47,13 @@ lapply(games, function(game){
 
 ```{r final_results}
 output$final_results_plot <- renderPlot({
-    plot_data <- final_results[event_id == input$selected_event]
-    ggplot(plot_data, aes(x=full_name, y=event_points, fill=game_name)) +
-        geom_bar(stat = "identity", position = "stack") +
-        theme_bw() +
-        labs(x="Player", y="Points", fill="Game")
+    if(nrow(final_results) > 0){
+        plot_data <- final_results[event_id == input$selected_event]
+        ggplot(plot_data, aes(x=full_name, y=event_points, fill=game_name)) +
+            geom_bar(stat = "identity", position = "stack") +
+            theme_bw() +
+            labs(x="Player", y="Points", fill="Game")
+    }
 })
 plotOutput("final_results_plot")
 ```

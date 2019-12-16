@@ -26,4 +26,7 @@ results <- list(
     ctr = multiplayer_results(raw_results[["ctr"]], metric="position", positive = "low")
 )
 
-final_results <- create_final_results(results)[df_players, on="player_id"][,-c("first_name", "last_name")]
+final_results <- create_final_results(results)
+if(nrow(final_results) > 0){
+    final_results <- final_results[df_players, on="player_id"][,-c("first_name", "last_name")]
+}
