@@ -31,20 +31,22 @@ ui <- fluidPage(
 
 server <- function(input, output) {
     # Get data reactives
-    get_players <- reactive({return(query("select * from player;"))})
-    get_events <- reactive({return(query("select * from event;"))})
-    get_event_players <- reactive({return(query("select * from event_players;"))})
+    withProgress(message = "Connecting to server...", value = 0.5, {
+        data <- reactiveValues(
+            players = query("select * from player;"),
+            events = query("select * from event;"),
+            event_players = query("select * from event_players;")
+        )
+    })
     
     # Create selectors for new events and players
     output$event_selector <- renderUI({
-        events <- get_events()
-        event_options <- setNames(events$event_id, events$event_name)
+        event_options <- setNames(data$events$event_id, data$events$event_name)
         selectInput("selected_event", "Select event", choices = event_options, multiple = FALSE)
     })
     
     output$new_event_players_selector <- renderUI({
-        players <- get_players()
-        player_options <- setNames(players$player_id, paste(players$first_name, players$last_name))
+        player_options <- setNames(data$players$player_id, paste(data$players$first_name, data$players$last_name))
         selectInput("new_event_players", "Select event players", choices = player_options, multiple = TRUE)
     })
     
@@ -53,6 +55,7 @@ server <- function(input, output) {
         if(nchar(input$new_user_first_name) >= 1 & nchar(input$new_user_last_name) >= 1){
             withProgress(message = 'Creating user', value = 0.5,{
                 create_user(input$new_user_first_name, input$new_user_last_name)
+                data$players <- query("select * from player;")
                 showNotification(
                     paste0("User '",input$new_user_first_name, " ", input$new_user_last_name,"' created!")
                 )
@@ -65,6 +68,8 @@ server <- function(input, output) {
         if((length(input$new_event_players) > 1) & (nchar(input$new_event_name) > 0)){
             withProgress(message = 'Creating event', value = 0.5,{
                 create_event(input$new_event_name, input$new_event_players)
+                data$events <- query("select * from event;")
+                data$event_players <- query("select * from event_players;")
                 showNotification(paste0("Event '", input$new_event_name,"' created!"))
             })
         }
