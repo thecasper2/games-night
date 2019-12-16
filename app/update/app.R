@@ -10,10 +10,11 @@ ui <- fluidPage(
         sidebarPanel(width = 3,
             h2("Select event"),
             uiOutput("event_selector"),
-            textInput("event_password", "Event password", value=""),
+            numericInput("event_pin", "Event pin", value=0, min=0, max=9999),
             h2("Create new event"),
             textInput("new_event_name", "New event name:", value=""),
             uiOutput("new_event_players_selector"),
+            numericInput("new_event_pin", "New event pin", value=0, min=0, max=9999),
             actionButton("submit_new_event", label="Create new event", icon("refresh")),
             h2("Create new players"),
             textInput("new_user_first_name", "New user first name", value="Mr"),
@@ -129,7 +130,7 @@ server <- function(input, output, session) {
     observeEvent(input$submit_new_event, {
         if((length(input$new_event_players) > 1) & (nchar(input$new_event_name) > 0)){
             withProgress(message = 'Creating event', value = 0.5,{
-                create_event(input$new_event_name, input$new_event_players)
+                create_event(input$new_event_name, input$new_event_players, pin=input$new_event_pin)
                 data$events <- query("select * from event;")
                 data$event_players <- query("select * from event_players;")
                 showNotification(paste0("Event '", input$new_event_name,"' created!"))
@@ -174,7 +175,8 @@ server <- function(input, output, session) {
         # 2) On confirm, submit results, update table and show notification
         vars <- games[[game]]
         observeEvent(input[[paste0("submit_", vars$name, "_results")]], {
-            pass <- validate_data(game=vars$name, style=vars$style, input)
+            valid_pin <- data$events[event_id == input$selected_event]$pin
+            pass <- validate_data(game=vars$name, style=vars$style, input, valid_pin)
             if(pass){
                 confirmSweetAlert(
                     session = session,

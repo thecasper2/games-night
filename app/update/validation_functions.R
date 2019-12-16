@@ -27,7 +27,11 @@ validate_position <- function(game, input){
     return(FALSE)
 }
 
-validate_data <- function(game, style, input){
+validate_data <- function(game, style, input, valid_pin){
+    if(valid_pin != input$event_pin){
+        showNotification("Event pin is incorrect!", type="error")
+        return(FALSE)
+    }
     if(style=="h2h"){
         v <- validate_head_to_head(game, input)
         return(v)

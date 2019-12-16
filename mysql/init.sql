@@ -19,6 +19,7 @@ CREATE TABLE event (
     event_id INT NOT NULL AUTO_INCREMENT,
     creation_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     event_name VARCHAR(100) NOT NULL,
+    pin INT NOT NULL,
     PRIMARY KEY (event_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

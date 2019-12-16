@@ -40,9 +40,9 @@ create_user <- function(first_name, last_name){
         glue %>% query(data=FALSE)
 }
 
-create_event <- function(event_name, player_ids){
+create_event <- function(event_name, player_ids, pin=1234){
     # Creates a new event with the selected players
-    "INSERT INTO event (event_name) VALUES ('{event_name}');" %>%
+    "INSERT INTO event (event_name, pin) VALUES ('{event_name}', {pin});" %>%
         glue %>% query(data=FALSE)
     
     event_id <- query(
