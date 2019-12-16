@@ -26,3 +26,14 @@ validate_position <- function(game, input){
     else (return(TRUE))
     return(FALSE)
 }
+
+validate_data <- function(game, style, input){
+    if(style=="h2h"){
+        v <- validate_head_to_head(game, input)
+        return(v)
+    }
+    if(style=="position"){
+        v <- validate_position(game, input)
+        return(v)
+    }
+}

@@ -72,7 +72,7 @@ ui <- fluidPage(
                         uiOutput("rps_player_2"),
                         uiOutput("rps_score_2")
                     ),
-                    actionButton("submit_rps_results", label="Submit results", icon("refresh")),
+                    actionButton("ps_results", label="Submit results", icon("refresh")),
                     hr(),
                     dataTableOutput("rps_results_table")
                 )
@@ -176,7 +176,7 @@ server <- function(input, output, session) {
     })
     ## submit
     observeEvent(input$submit_fifa_results, {
-        pass <- validate_head_to_head("fifa", input)
+        pass <- validate_data("fifa", "h2h", input)
         if(pass){
             confirmSweetAlert(
                 session = session,
@@ -188,7 +188,7 @@ server <- function(input, output, session) {
     })
     observeEvent(input$fifa_submit_confirm, {
         if(isTRUE(input$fifa_submit_confirm)){
-                submit_head_to_head("fifa", "goals", input)
+                submit_results(game="fifa", style="h2h", metric="goals", input=input)
                 results$fifa <- get_results("fifa", "h2h")
                 showNotification("Results submitted!")
         }
@@ -209,7 +209,7 @@ server <- function(input, output, session) {
     })
     ## submit
     observeEvent(input$submit_headers_and_volleys_results, {
-        pass <- validate_position("headers_and_volleys", input)
+        pass <- validate_data("headers_and_volleys", "position", input)
         if(pass){
             confirmSweetAlert(
                 session = session,
@@ -221,7 +221,7 @@ server <- function(input, output, session) {
     })
     observeEvent(input$headers_and_volleys_submit_confirm, {
         if(isTRUE(input$headers_and_volleys_submit_confirm)){
-            submit_position("headers_and_volleys", input)
+            submit_results(game="headers_and_volleys", style="position", input=input)
             results$headers_and_volleys <- get_results("headers_and_volleys", "position")
             showNotification("Results submitted!")
         }
@@ -248,7 +248,7 @@ server <- function(input, output, session) {
     })
     ## submit
     observeEvent(input$submit_ctr_results, {
-        pass <- validate_position("ctr", input)
+        pass <- validate_data("ctr", "position", input)
         if(pass){
             confirmSweetAlert(
                 session = session,
@@ -260,7 +260,7 @@ server <- function(input, output, session) {
     })
     observeEvent(input$ctr_submit_confirm, {
         if(isTRUE(input$ctr_submit_confirm)){
-            submit_position("ctr", input)
+            submit_results(game="ctr", style="position", input=input)
             results$ctr <- get_results("ctr", "position")
             showNotification("Results submitted!")
         }
@@ -281,7 +281,7 @@ server <- function(input, output, session) {
     })
     ## submit
     observeEvent(input$submit_ticket_to_ride_results, {
-        pass <- validate_position("ticket_to_ride", input)
+        pass <- validate_data("ticket_to_ride", "position", input)
         if(pass){
             confirmSweetAlert(
                 session = session,
@@ -293,7 +293,7 @@ server <- function(input, output, session) {
     })
     observeEvent(input$ticket_to_ride_submit_confirm, {
         if(isTRUE(input$ticket_to_ride_submit_confirm)){
-            submit_position("ticket_to_ride", input)
+            submit_results(game="ticket_to_ride", style="position", input=input)
             results$ticket_to_ride <- get_results("ticket_to_ride", "position")
             showNotification("Results submitted!")
         }
@@ -328,7 +328,7 @@ server <- function(input, output, session) {
     })
     ## submit
     observeEvent(input$submit_rps_results, {
-        pass <- validate_head_to_head("rps", input)
+        pass <- validate_data("rps", "h2h", input)
         if(pass){
             confirmSweetAlert(
                 session = session,
@@ -340,7 +340,7 @@ server <- function(input, output, session) {
     })
     observeEvent(input$rps_submit_confirm, {
         if(isTRUE(input$rps_submit_confirm)){
-            submit_head_to_head("rps", "wins", input)
+            submit_results(game="rps", style="h2h", metric="wins", input)
             results$rps <- get_results("rps", "h2h")
             showNotification("Results submitted!")
         }

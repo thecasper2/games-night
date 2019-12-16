@@ -28,6 +28,11 @@ submit_position <- function(game, input){
             values_string <- "{match_id}, {event_id}, {player_id}, {position}" %>% glue
             submit_results(variables_string, values_string, game=game)
         }
-        Sys.sleep(2)
+        Sys.sleep(1.5)
     })
+}
+
+submit_results <- function(game, style, metric=NULL, input){
+    if(style=="h2h"){submit_head_to_head(game, metric, input)}
+    if(style=="position"){submit_position(game, input)}
 }
