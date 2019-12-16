@@ -13,7 +13,7 @@ get_results <- function(game, style){
                 " %>% glue
         )
         result <- result[, -c("home_player_id", "away_player_id")]
-        return(result[order(event_id, match_id)])
+        return(result)
     }
     if(style=="position"){
         result <- query("
@@ -24,6 +24,6 @@ get_results <- function(game, style){
             " %>% glue
         )
         result <- result[, -c("player_id")]
-        return(result[order(event_id, match_id)])
+        return(result)
     }
 }

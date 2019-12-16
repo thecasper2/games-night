@@ -177,11 +177,12 @@ server <- function(input, output) {
         pass <- validate_head_to_head("fifa", input)
         if(pass){
             submit_head_to_head("fifa", "goals", input)
+            results$fifa <- get_results("fifa", "h2h")
             showNotification("Results submitted!")
         }
     })
     output$fifa_results_table <- renderDataTable({
-        results$fifa[event_id == input$selected_event][,-c("event_id")]
+        results$fifa[event_id == input$selected_event][,-c("event_id")][order(-match_id)]
     })
 
     # Headers and Volleys
@@ -197,17 +198,17 @@ server <- function(input, output) {
         pass <- validate_position("headers_and_volleys", input)
         if(pass){
             submit_position("headers_and_volleys", input)
+            results$headers_and_volleys <- get_results("headers_and_volleys", "position")
             showNotification("Results submitted!")
         }
     })
     output$headers_and_volleys_results_table <- renderDataTable({
-        results$headers_and_volleys[event_id == input$selected_event][,-c("event_id")]
+        results$headers_and_volleys[event_id == input$selected_event][,-c("event_id")][order(-match_id, position)]
     })
 
     # Catan
-
     output$catan_results_table <- renderDataTable({
-        results$catan[event_id == input$selected_event][,-c("event_id")]
+        results$catan[event_id == input$selected_event][,-c("event_id")][order(-match_id, victory_points)]
     })
 
     # CTR
@@ -223,11 +224,12 @@ server <- function(input, output) {
         pass <- validate_position("ctr", input)
         if(pass){
             submit_position("ctr", input)
+            results$ctr <- get_results("ctr", "position")
             showNotification("Results submitted!")
         }
     })
     output$ctr_results_table <- renderDataTable({
-        results$ctr[event_id == input$selected_event][,-c("event_id")]
+        results$ctr[event_id == input$selected_event][,-c("event_id")][order(-match_id, position)]
     })
 
     # Ticket to ride
@@ -243,11 +245,12 @@ server <- function(input, output) {
         pass <- validate_position("ticket_to_ride", input)
         if(pass){
             submit_position("ticket_to_ride", input)
+            results$ticket_to_ride <- get_results("ticket_to_ride", "position")
             showNotification("Results submitted!")
         }
     })
     output$ticket_to_ride_results_table <- renderDataTable({
-        results$ticket_to_ride[event_id == input$selected_event][,-c("event_id")]
+        results$ticket_to_ride[event_id == input$selected_event][,-c("event_id")][order(-match_id, position)]
     })
 
     # Rock Paper Scissors
@@ -277,11 +280,12 @@ server <- function(input, output) {
         pass <- validate_head_to_head("rps", input)
         if(pass){
             submit_head_to_head("rps", "wins", input)
+            results$rps <- get_results("rps", "h2h")
             showNotification("Results submitted!")
         }
     })
     output$rps_results_table <- renderDataTable({
-        results$rps[event_id == input$selected_event][,-c("event_id")]
+        results$rps[event_id == input$selected_event][,-c("event_id")][order(-match_id)]
     })
 }
 
