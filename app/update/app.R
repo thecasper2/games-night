@@ -6,7 +6,7 @@ source("../games/mysql_functions.R")
 ui <- fluidPage(
     titlePanel("Games night update scores"),
     sidebarLayout(
-        sidebarPanel(
+        sidebarPanel(width = 3,
             h2("Select event"),
             uiOutput("event_selector"),
             textInput("event_password", "Event password", value=""),
@@ -31,24 +31,35 @@ ui <- fluidPage(
                         uiOutput("fifa_player_2"),
                         uiOutput("fifa_score_2")
                     ),
-                    actionButton("submit_fifa_results", label="Submit results", icon("refresh"))
+                    actionButton("submit_fifa_results", label="Submit results", icon("refresh")),
+                    hr(),
+                    dataTableOutput("fifa_results_table")
                 ),
                 tabPanel("Headers and Volleys",
                     img(src="headers_and_volleys.jpg", height="30%", width="30%", align = "top"),
                     uiOutput("headers_and_volleys_results_selector"),
-                    actionButton("submit_headers_and_volleys_results", label="Submit results", icon("refresh"))),
+                    actionButton("submit_headers_and_volleys_results", label="Submit results", icon("refresh")),
+                    hr(),
+                    dataTableOutput("headers_and_volleys_results_table")
+                ),
                 tabPanel("Catan",
-                    img(src="catan.svg", height="15%", width="15%", align = "top")
+                    img(src="catan.svg", height="15%", width="15%", align = "top"),
+                    hr(),
+                    dataTableOutput("catan_results_table")
                 ),
                 tabPanel("CTR",
                     img(src="ctr.png", height="25%", width="25%", align = "top"),
                     uiOutput("ctr_results_selector"),
-                    actionButton("submit_ctr_results", label="Submit results", icon("refresh"))
+                    actionButton("submit_ctr_results", label="Submit results", icon("refresh")),
+                    hr(),
+                    dataTableOutput("ctr_results_table")
                 ),
                 tabPanel("Ticket to Ride",
                     img(src="ticket_to_ride.jpg", height="30%", width="30%", align = "top"),
                     uiOutput("ticket_to_ride_results_selector"),
-                    actionButton("submit_ticket_to_ride_results", label="Submit results", icon("refresh"))
+                    actionButton("submit_ticket_to_ride_results", label="Submit results", icon("refresh")),
+                    hr(),
+                    dataTableOutput("ticket_to_ride_results_table")
                 ),
                 tabPanel("Rock Paper Scissors",
                     img(src="rps.png", height="20%", width="20%", align = "top"),
@@ -60,7 +71,9 @@ ui <- fluidPage(
                         uiOutput("rps_player_2"),
                         uiOutput("rps_score_2")
                     ),
-                    actionButton("submit_rps_results", label="Submit results", icon("refresh"))
+                    actionButton("submit_rps_results", label="Submit results", icon("refresh")),
+                    hr(),
+                    dataTableOutput("rps_results_table")
                 )
             )
         )
@@ -70,13 +83,23 @@ ui <- fluidPage(
 server <- function(input, output) {
     source("validation_functions.R")
     source("submit_functions.R")
+    source("result_functions.R")
 
     # Get data reactives
-    withProgress(message = "Connecting to server...", value = 0.5, {
+    withProgress(message = "Getting data", value = 0.5, {
         data <- reactiveValues(
             players = query("select * from player;"),
             events = query("select * from event;"),
             event_players = query("select * from event_players;")
+        )
+
+        results <- reactiveValues(
+            fifa = get_results("fifa", "h2h"),
+            headers_and_volleys = get_results("headers_and_volleys", "position"),
+            catan = get_results("catan", "position"),
+            ctr = get_results("ctr", "position"),
+            ticket_to_ride = get_results("ticket_to_ride", "position"),
+            rps = get_results("rps", "h2h")
         )
     })
     
@@ -111,7 +134,7 @@ server <- function(input, output) {
                 create_event(input$new_event_name, input$new_event_players)
                 data$events <- query("select * from event;")
                 data$event_players <- query("select * from event_players;")
-                ication(paste0("Event '", input$new_event_name,"' created!"))
+                showNotification(paste0("Event '", input$new_event_name,"' created!"))
             })
         }
         else if (nchar(input$new_event_name) <= 0){showNotification("Event name too short!", type="error")}
@@ -157,6 +180,9 @@ server <- function(input, output) {
             showNotification("Results submitted!")
         }
     })
+    output$fifa_results_table <- renderDataTable({
+        results$fifa[event_id == input$selected_event][,-c("event_id")]
+    })
 
     # Headers and Volleys
     output$headers_and_volleys_results_selector <- renderUI({
@@ -174,8 +200,15 @@ server <- function(input, output) {
             showNotification("Results submitted!")
         }
     })
+    output$headers_and_volleys_results_table <- renderDataTable({
+        results$headers_and_volleys[event_id == input$selected_event][,-c("event_id")]
+    })
 
     # Catan
+
+    output$catan_results_table <- renderDataTable({
+        results$catan[event_id == input$selected_event][,-c("event_id")]
+    })
 
     # CTR
     output$ctr_results_selector <- renderUI({
@@ -193,6 +226,9 @@ server <- function(input, output) {
             showNotification("Results submitted!")
         }
     })
+    output$ctr_results_table <- renderDataTable({
+        results$ctr[event_id == input$selected_event][,-c("event_id")]
+    })
 
     # Ticket to ride
     output$ticket_to_ride_results_selector <- renderUI({
@@ -209,6 +245,9 @@ server <- function(input, output) {
             submit_position("ticket_to_ride", input)
             showNotification("Results submitted!")
         }
+    })
+    output$ticket_to_ride_results_table <- renderDataTable({
+        results$ticket_to_ride[event_id == input$selected_event][,-c("event_id")]
     })
 
     # Rock Paper Scissors
@@ -240,6 +279,9 @@ server <- function(input, output) {
             submit_head_to_head("rps", "wins", input)
             showNotification("Results submitted!")
         }
+    })
+    output$rps_results_table <- renderDataTable({
+        results$rps[event_id == input$selected_event][,-c("event_id")]
     })
 }
 
