@@ -1,6 +1,8 @@
 library(glue)
 library(magrittr)
 
+test_numeric <- function(a){return(!is.na(suppressWarnings(as.numeric(a))))}
+
 validate_head_to_head <- function(game, input){
     inputs <- list(
         player_1 = "{game}_player_1" %>% glue,
@@ -27,6 +29,26 @@ validate_position <- function(game, input){
     return(FALSE)
 }
 
+validate_catan <- function(game, input){
+    # We check that:
+    # - There are more than 1 players selected
+    # - There are as many victory points as players
+    # - All victory points are numeric
+    player_order <- "{game}_results" %>% glue
+    vp <- unlist(strsplit(input$catan_victory_points, split=","))
+    if(!(length(input[[player_order]]) > 1)){
+        showNotification("There are too few players in this match!", type="error")
+    }
+    else if(length(input[[player_order]]) != length(vp)){
+        showNotification("The number of victory points doesn't match the number of players", type="error")
+    }
+    else if(min(sapply(vp, test_numeric)) < 1){
+        showNotification("The victory points are not all numerical", type="error")
+    }
+    else (return(TRUE))
+    return(FALSE)
+}
+
 validate_data <- function(game, style, input, valid_pin){
     if(valid_pin != input$event_pin){
         showNotification("Event pin is incorrect!", type="error")
@@ -38,6 +60,10 @@ validate_data <- function(game, style, input, valid_pin){
     }
     if(style=="position"){
         v <- validate_position(game, input)
+        return(v)
+    }
+    if(style=="catan"){
+        v <- validate_catan(game, input)
         return(v)
     }
 }

@@ -40,6 +40,9 @@ ui <- fluidPage(
                 ),
                 tabPanel("Catan",
                     img(src="catan.svg", height="15%", width="15%", align = "top"),
+                    uiOutput("catan_results_selector"),
+                    textInput("catan_victory_points", "Respective victory points (comma separated, no spaces)", "10,5,5"),
+                    actionButton("submit_catan_results", label="Submit results", icon("refresh")),
                     hr(),
                     dataTableOutput("catan_results_table")
                 ),
@@ -161,7 +164,7 @@ server <- function(input, output, session) {
         rps = list(name="rps", style="h2h", metric="wins", order_cols=c("match_id")),
         headers_and_volleys = list(name="headers_and_volleys", style="position", metric=NULL, order_cols=c("match_id", "position")),
         ticket_to_ride = list(name="ticket_to_ride", style="position", metric=NULL, order_cols=c("match_id", "position")),
-        #catan = list(game="catan", style="position", metric=NULL, order_cols=c("match_id", "victory_points")),
+        catan = list(name="catan", style="catan", metric=NULL, order_cols=c("match_id", "victory_points")),
         ctr = list(name="ctr", style="position", metric=NULL, order_cols=c("match_id", "position"))
     )
 
@@ -226,7 +229,7 @@ server <- function(input, output, session) {
                 numericInput(paste0(vars$name, "_score_2"), "Second player score", value=0, min=0, step=1)
             })
         }
-        if(vars$style == "position"){
+        if(vars$style %in% c("position", "catan")){
             output[[paste0(vars$name, "_results_selector")]] <- renderUI({
                 selectInput(
                     paste0(vars$name, "_results"), "Select players in order of finishing position",
@@ -246,15 +249,6 @@ server <- function(input, output, session) {
     lapply(names(games), FUN = create_table)
     ## Selectors
     lapply(names(games), FUN = create_selectors, players=eligible_players)
-
-    ########
-    # Catan
-    ########
-
-    ## table
-    output$catan_results_table <- renderDataTable({
-        results$catan[event_id == input$selected_event][,-c("event_id")][order(-match_id, victory_points)]
-    })
 }
 
 shinyApp(ui = ui, server = server)

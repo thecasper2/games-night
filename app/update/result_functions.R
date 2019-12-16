@@ -15,7 +15,7 @@ get_results <- function(game, style){
         result <- result[, -c("home_player_id", "away_player_id")]
         return(result)
     }
-    if(style=="position"){
+    if(style %in% c("position", "catan")){
         result <- query("
                 select
                 concat(p.first_name, ' ', p.last_name) AS name,
