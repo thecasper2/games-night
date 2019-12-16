@@ -6,8 +6,8 @@ db_variables <- list(
     user="root",
     password="example",
     dbname="adolphin",
-    host="127.0.0.1",
-    port=3308
+    host="db",
+    port=3306
 )
 
 con <- function(db_variables){
