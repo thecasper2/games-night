@@ -24,14 +24,8 @@ ui <- fluidPage(
             tabsetPanel(
                 tabPanel("FIFA",
                     img(src="fifa.svg", height="15%", width="15%", align = "top"),
-                    div(style="display:flex",
-                        uiOutput("fifa_player_1"),
-                        uiOutput("fifa_score_1")
-                    ),
-                    div(style="display:flex",
-                        uiOutput("fifa_player_2"),
-                        uiOutput("fifa_score_2")
-                    ),
+                    div(style="display:flex", uiOutput("fifa_player_1"), uiOutput("fifa_score_1")),
+                    div(style="display:flex", uiOutput("fifa_player_2"), uiOutput("fifa_score_2")),
                     actionButton("submit_fifa_results", label="Submit results", icon("refresh")),
                     hr(),
                     dataTableOutput("fifa_results_table")
@@ -64,14 +58,8 @@ ui <- fluidPage(
                 ),
                 tabPanel("Rock Paper Scissors",
                     img(src="rps.png", height="20%", width="20%", align = "top"),
-                    div(style="display:flex",
-                        uiOutput("rps_player_1"),
-                        uiOutput("rps_score_1")
-                    ),
-                    div(style="display:flex",
-                        uiOutput("rps_player_2"),
-                        uiOutput("rps_score_2")
-                    ),
+                    div(style="display:flex", uiOutput("rps_player_1"), uiOutput("rps_score_1")),
+                    div(style="display:flex", uiOutput("rps_player_2"), uiOutput("rps_score_2")),
                     actionButton("submit_rps_results", label="Submit results", icon("refresh")),
                     hr(),
                     dataTableOutput("rps_results_table")
