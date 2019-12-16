@@ -74,9 +74,9 @@ server <- function(input, output, session) {
     source("submit_functions.R")
     source("result_functions.R")
 
-    #####################
-    # Get data reactives
-    #####################
+    ####################
+    # Initial data grab
+    ####################
 
     withProgress(message = "Getting data", value = 0.5, {
         data <- reactiveValues(
