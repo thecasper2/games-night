@@ -10,6 +10,7 @@ RUN R -e "install.packages(c('data.table'))"
 RUN R -e "install.packages(c('flexdashboard'))"
 RUN R -e "install.packages(c('ggplot2'))"
 RUN R -e "install.packages(c('RMySQL'))"
+RUN R -e "install.packages(c('shinyWidgets'))"
 
 # make all app files readable (solves issue when dev in Windows, but building in Ubuntu)
 RUN chmod -R 755 /srv/shiny-server/

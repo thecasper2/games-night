@@ -1,6 +1,7 @@
 library(data.table)
 library(magrittr)
 library(shiny)
+library(shinyWidgets)
 source("../games/mysql_functions.R")
 
 ui <- fluidPage(
@@ -80,7 +81,7 @@ ui <- fluidPage(
     )
 )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
     source("validation_functions.R")
     source("submit_functions.R")
     source("result_functions.R")
@@ -173,14 +174,26 @@ server <- function(input, output) {
     output$fifa_score_2 <- renderUI({
         numericInput("fifa_score_2", "Second player score", value=0, min=0, step=1)
     })
+    ## submit
     observeEvent(input$submit_fifa_results, {
         pass <- validate_head_to_head("fifa", input)
         if(pass){
-            submit_head_to_head("fifa", "goals", input)
-            results$fifa <- get_results("fifa", "h2h")
-            showNotification("Results submitted!")
+            confirmSweetAlert(
+                session = session,
+                inputId = "fifa_submit_confirm",
+                type = "warning",
+                title = "Submit FIFA results?"
+            )
         }
     })
+    observeEvent(input$fifa_submit_confirm, {
+        if(isTRUE(input$fifa_submit_confirm)){
+                submit_head_to_head("fifa", "goals", input)
+                results$fifa <- get_results("fifa", "h2h")
+                showNotification("Results submitted!")
+        }
+    })
+    ## table
     output$fifa_results_table <- renderDataTable({
         results$fifa[event_id == input$selected_event][,-c("event_id")][order(-match_id)]
     })
@@ -194,19 +207,32 @@ server <- function(input, output) {
             multiple = TRUE
         )
     })
+    ## submit
     observeEvent(input$submit_headers_and_volleys_results, {
         pass <- validate_position("headers_and_volleys", input)
         if(pass){
+            confirmSweetAlert(
+                session = session,
+                inputId = "headers_and_volleys_submit_confirm",
+                type = "warning",
+                title = "Submit Headers and Volleys results?"
+            )
+        }
+    })
+    observeEvent(input$headers_and_volleys_submit_confirm, {
+        if(isTRUE(input$headers_and_volleys_submit_confirm)){
             submit_position("headers_and_volleys", input)
             results$headers_and_volleys <- get_results("headers_and_volleys", "position")
             showNotification("Results submitted!")
         }
     })
+    ## table
     output$headers_and_volleys_results_table <- renderDataTable({
         results$headers_and_volleys[event_id == input$selected_event][,-c("event_id")][order(-match_id, position)]
     })
 
     # Catan
+    ## table
     output$catan_results_table <- renderDataTable({
         results$catan[event_id == input$selected_event][,-c("event_id")][order(-match_id, victory_points)]
     })
@@ -220,14 +246,26 @@ server <- function(input, output) {
             multiple = TRUE
         )
     })
+    ## submit
     observeEvent(input$submit_ctr_results, {
         pass <- validate_position("ctr", input)
         if(pass){
+            confirmSweetAlert(
+                session = session,
+                inputId = "ctr_submit_confirm",
+                type = "warning",
+                title = "Submit CTR results?"
+            )
+        }
+    })
+    observeEvent(input$ctr_submit_confirm, {
+        if(isTRUE(input$ctr_submit_confirm)){
             submit_position("ctr", input)
             results$ctr <- get_results("ctr", "position")
             showNotification("Results submitted!")
         }
     })
+    ## table
     output$ctr_results_table <- renderDataTable({
         results$ctr[event_id == input$selected_event][,-c("event_id")][order(-match_id, position)]
     })
@@ -241,14 +279,26 @@ server <- function(input, output) {
             multiple = TRUE
         )
     })
+    ## submit
     observeEvent(input$submit_ticket_to_ride_results, {
         pass <- validate_position("ticket_to_ride", input)
         if(pass){
+            confirmSweetAlert(
+                session = session,
+                inputId = "ticket_to_ride_submit_confirm",
+                type = "warning",
+                title = "Submit Ticket to Ride results?"
+            )
+        }
+    })
+    observeEvent(input$ticket_to_ride_submit_confirm, {
+        if(isTRUE(input$ticket_to_ride_submit_confirm)){
             submit_position("ticket_to_ride", input)
             results$ticket_to_ride <- get_results("ticket_to_ride", "position")
             showNotification("Results submitted!")
         }
     })
+    ## table
     output$ticket_to_ride_results_table <- renderDataTable({
         results$ticket_to_ride[event_id == input$selected_event][,-c("event_id")][order(-match_id, position)]
     })
@@ -276,14 +326,26 @@ server <- function(input, output) {
     output$rps_score_2 <- renderUI({
         numericInput("rps_score_2", "Second player score", value=0, min=0, step=1)
     })
+    ## submit
     observeEvent(input$submit_rps_results, {
         pass <- validate_head_to_head("rps", input)
         if(pass){
+            confirmSweetAlert(
+                session = session,
+                inputId = "rps_submit_confirm",
+                type = "warning",
+                title = "Submit Rock Paper Scissors results?"
+            )
+        }
+    })
+    observeEvent(input$rps_submit_confirm, {
+        if(isTRUE(input$rps_submit_confirm)){
             submit_head_to_head("rps", "wins", input)
             results$rps <- get_results("rps", "h2h")
             showNotification("Results submitted!")
         }
     })
+    ## table
     output$rps_results_table <- renderDataTable({
         results$rps[event_id == input$selected_event][,-c("event_id")][order(-match_id)]
     })
