@@ -1,6 +1,7 @@
 library(data.table)
 library(glue)
 library(magrittr)
+library(RMySQL)
 
 db_variables <- list(
     user="root",
