@@ -153,12 +153,12 @@ server <- function(input, output, session) {
 
     # Create submit actions for all games
     games <- list(
-        fifa = list(name="fifa", style="h2h", metric="goals"),
-        rps = list(name="rps", style="h2h", metric="wins"),
-        headers_and_volleys = list(name="headers_and_volleys", style="position", metric=NULL),
-        ticket_to_ride = list(name="ticket_to_ride", style="position", metric=NULL),
-        #catan = list(game="catan", style="position", metric=NULL),
-        ctr = list(name="ctr", style="position", metric=NULL)
+        fifa = list(name="fifa", style="h2h", metric="goals", order_cols=c("match_id")),
+        rps = list(name="rps", style="h2h", metric="wins", order_cols=c("match_id")),
+        headers_and_volleys = list(name="headers_and_volleys", style="position", metric=NULL, order_cols=c("match_id", "position")),
+        ticket_to_ride = list(name="ticket_to_ride", style="position", metric=NULL, order_cols=c("match_id", "position")),
+        #catan = list(game="catan", style="position", metric=NULL, order_cols=c("match_id", "victory_points")),
+        ctr = list(name="ctr", style="position", metric=NULL, order_cols=c("match_id", "position"))
     )
 
     create_submit <- function(game){
@@ -186,8 +186,18 @@ server <- function(input, output, session) {
         })
     }
 
-    # Loop to create submits
+    create_table <- function(game){
+        vars <- games[[game]]
+        output[[paste0(vars$name, "_results_table")]] <- renderDataTable({
+            results[[vars$name]][event_id == input$selected_event][,-c("event_id")][order(-get(vars$order_cols))]
+        })
+    }
+
+    # Loop to create:
+    ## Submit actions
     lapply(names(games), FUN = create_submit)
+    ## Tables
+    lapply(names(games), FUN = create_table)
 
     # FIFA
     output$fifa_player_1 <- renderUI({
@@ -212,10 +222,6 @@ server <- function(input, output, session) {
     output$fifa_score_2 <- renderUI({
         numericInput("fifa_score_2", "Second player score", value=0, min=0, step=1)
     })
-    ## table
-    output$fifa_results_table <- renderDataTable({
-        results$fifa[event_id == input$selected_event][,-c("event_id")][order(-match_id)]
-    })
 
     # Headers and Volleys
     output$headers_and_volleys_results_selector <- renderUI({
@@ -225,10 +231,6 @@ server <- function(input, output, session) {
             choices = eligible_players(),
             multiple = TRUE
         )
-    })
-    ## table
-    output$headers_and_volleys_results_table <- renderDataTable({
-        results$headers_and_volleys[event_id == input$selected_event][,-c("event_id")][order(-match_id, position)]
     })
 
     # Catan
@@ -246,10 +248,6 @@ server <- function(input, output, session) {
             multiple = TRUE
         )
     })
-    ## table
-    output$ctr_results_table <- renderDataTable({
-        results$ctr[event_id == input$selected_event][,-c("event_id")][order(-match_id, position)]
-    })
 
     # Ticket to ride
     output$ticket_to_ride_results_selector <- renderUI({
@@ -259,10 +257,6 @@ server <- function(input, output, session) {
             choices = eligible_players(),
             multiple = TRUE
         )
-    })
-    ## table
-    output$ticket_to_ride_results_table <- renderDataTable({
-        results$ticket_to_ride[event_id == input$selected_event][,-c("event_id")][order(-match_id, position)]
     })
 
     # Rock Paper Scissors
@@ -287,10 +281,6 @@ server <- function(input, output, session) {
     })
     output$rps_score_2 <- renderUI({
         numericInput("rps_score_2", "Second player score", value=0, min=0, step=1)
-    })
-    ## table
-    output$rps_results_table <- renderDataTable({
-        results$rps[event_id == input$selected_event][,-c("event_id")][order(-match_id)]
     })
 }
 
