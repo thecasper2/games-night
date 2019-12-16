@@ -52,7 +52,26 @@ create_event <- function(event_name, player_ids){
     
     # Insert each selected player into the event players
     for(player_id in player_ids){
-        "INSERT INTO event_players (event_id, player_id) VALUES  ({event_id}, {player_id});" %>%
+        "INSERT INTO event_players (event_id, player_id) VALUES ({event_id}, {player_id});" %>%
             glue %>% query(data=FALSE)
     }
+}
+
+get_next_match_id <- function(game){
+    # Checks the latest match_id from a results table and returns the next value.
+    # Returns 1 if there is no match_id
+    id <- "select max(match_id) from {game}_results" %>% glue %>% query
+    if(is.na(id)){id <- 0}
+    return(id[[1]] + 1)
+}
+
+submit_results <- function(variables_string, value_string, game, increment_match_id=FALSE){
+    # Submits results to a results table. Requires:
+    # variables_string: a string of comma separated column names to update
+    # values_string: a string of comma separated values for the columns.
+    # NOTE if the match_id needs to be incremented, then you can submit the value {match_id}
+    # and set increment_match_id=TRUE, so that the match_id is retrieved and glued.
+    if(increment_match_id){match_id <- get_next_match_id(game)}
+    "INSERT INTO {game}_results ({variables_string}) VALUES ({values_string})" %>%
+        glue %>% glue %>% query(data=FALSE)
 }
