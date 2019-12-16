@@ -40,8 +40,10 @@ ui <- fluidPage(
                 ),
                 tabPanel("Catan",
                     img(src="catan.svg", height="15%", width="15%", align = "top"),
-                    uiOutput("catan_results_selector"),
-                    textInput("catan_victory_points", "Respective victory points (comma separated, no spaces)", "10,5,5"),
+                    div(style="display:flex",
+                        uiOutput("catan_results_selector"),
+                        textInput("catan_victory_points", "Respective victory points", "10,5,5")
+                    ),
                     actionButton("submit_catan_results", label="Submit results", icon("refresh")),
                     hr(),
                     dataTableOutput("catan_results_table")
