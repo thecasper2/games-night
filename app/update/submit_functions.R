@@ -1,6 +1,18 @@
 library(glue)
 library(magrittr)
 
+submit_head_to_head <- function(game, metric, input){
+    game_string <- "{game}_results" %>% glue
+    variables_string <- "event_id, home_player_id, away_player_id, home_{metric}, away_{metric}" %>% glue
+    event_id <- input$selected_event
+    home_player_id <- input[["{game}_player_1" %>% glue]]
+    away_player_id <- input[["{game}_player_2" %>% glue]]
+    home_score <- input[["{game}_score_1" %>% glue]]
+    away_score <- input[["{game}_score_2" %>% glue]]
+    values_string <- "{event_id}, {home_player_id}, {away_player_id}, {home_score}, {away_score}" %>% glue
+    submit_results(variables_string, values_string, game=game)
+}
+
 submit_position <- function(game, input){
     game_string <- "{game}_results" %>% glue
     variables_string <- "match_id, event_id, player_id, position"

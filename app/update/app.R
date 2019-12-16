@@ -152,7 +152,10 @@ server <- function(input, output) {
     })
     observeEvent(input$submit_fifa_results, {
         pass <- validate_head_to_head("fifa", input)
-        if(pass){showNotification("Results submitted!")}
+        if(pass){
+            submit_head_to_head("fifa", "goals", input)
+            showNotification("Results submitted!")
+        }
     })
 
     # Headers and Volleys
@@ -233,7 +236,10 @@ server <- function(input, output) {
     })
     observeEvent(input$submit_rps_results, {
         pass <- validate_head_to_head("rps", input)
-        if(pass){showNotification("Results submitted!")}
+        if(pass){
+            submit_head_to_head("rps", "wins", input)
+            showNotification("Results submitted!")
+        }
     })
 }
 
