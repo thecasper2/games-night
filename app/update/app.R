@@ -8,18 +8,36 @@ ui <- fluidPage(
     titlePanel("Games night update scores"),
     sidebarLayout(
         sidebarPanel(width = 3,
-            h2("Select event"),
-            uiOutput("event_selector"),
-            numericInput("event_pin", "Event pin", value=0, min=0, max=9999),
-            h2("Create new event"),
-            textInput("new_event_name", "New event name:", value=""),
-            uiOutput("new_event_players_selector"),
-            numericInput("new_event_pin", "New event pin", value=0, min=0, max=9999),
-            actionButton("submit_new_event", label="Create new event", icon("refresh")),
-            h2("Create new players"),
-            textInput("new_user_first_name", "New user first name", value="Mr"),
-            textInput("new_user_last_name", "New user last name", value="Chips"),
-            actionButton("submit_new_user", label="Create new user", icon("refresh"))
+            tabsetPanel(
+                tabPanel("Select",
+                    h2("Select event"),
+                    uiOutput("event_selector"),
+                    numericInput("event_pin", "Event pin", value=0, min=0, max=9999)
+                ),
+                tabPanel("Create",
+                    h2("Create new players"),
+                    textInput("new_user_first_name", "New user first name", value="Mr"),
+                    textInput("new_user_last_name", "New user last name", value="Chips"),
+                    actionButton("submit_new_user", label="Create new user", icon("refresh")),
+                    h2("Create new event"),
+                    textInput("new_event_name", "New event name:", value=""),
+                    uiOutput("new_event_players_selector"),
+                    numericInput("new_event_pin", "New event pin", value=0, min=0, max=9999),
+                    actionButton("submit_new_event", label="Create new event", icon("refresh"))
+                ),
+                tabPanel("Delete",
+                    h2("Delete results"),
+                    uiOutput("delete_game_selector"),
+                    numericInput(
+                        "selected_match_id_delete",
+                        "Match ID to delete",
+                        value=1,
+                        min=1,
+                        max=9999
+                    ),
+                    actionButton("delete_match_id", label="Delete match ID", icon("bomb"))
+                )
+            )
         ),
         mainPanel(
             tabsetPanel(
@@ -251,6 +269,46 @@ server <- function(input, output, session) {
     lapply(names(games), FUN = create_table)
     ## Selectors
     lapply(names(games), FUN = create_selectors, players=eligible_players)
+
+    #################
+    # Delete results
+    #################
+
+    output$delete_game_selector <- renderUI({
+        selectInput("selected_delete_game", "Select game to delete from", names(games))
+    })
+    observeEvent(input$delete_match_id, {
+        if(data$events[event_id == input$selected_event]$pin != input$event_pin){
+            showNotification("Event pin is incorrect!", type="error")
+        } else {
+            confirmSweetAlert(
+                session = session,
+                inputId = "delete_confirm",
+                type = "warning",
+                title = paste0(
+                    "Delete ",
+                    input$selected_delete_game,
+                    " match ID: ",
+                    input$selected_match_id_delete,
+                    "?"
+                )
+            )
+        }
+    })
+    observeEvent(input$delete_confirm, {
+        game <- input$selected_delete_game
+        delete_match_id <- input$selected_match_id_delete
+        event_id <- input$selected_event
+        delete_string <- "
+            delete
+            from {game}_results
+            where
+                match_id = {delete_match_id}
+                AND event_id = {event_id};" %>% glue
+        query(delete_string, data = FALSE)
+        showNotification("Match deleted!")
+        results[[game]] <- get_results(game, games[[game]]$style)
+    })
 }
 
 shinyApp(ui = ui, server = server)
