@@ -37,7 +37,7 @@ Row {.tabset}
 
 ```{r output_results, message=FALSE, warning=FALSE, include=FALSE}
 lapply(games, function(game){
-    output[[game]] <- renderDataTable({
+    output[[game]] <- renderTable({
         results[[game]][df_players, on="player_id"][event_id == input$selected_event][order(-event_points)][,-c("event_id", "player_id", "first_name", "last_name")]
     })
 })
@@ -62,35 +62,35 @@ plotOutput("final_results_plot")
 ### FIFA
 
 ```{r fifa_results}
-dataTableOutput("fifa")
+tableOutput("fifa")
 ```
 
 ### Headers and Volleys
 
 ```{r headers_and_volleys_results}
-dataTableOutput("headers_and_volleys")
+tableOutput("headers_and_volleys")
 ```
 
 ### Catan
 
 ```{r catan_results}
-dataTableOutput("catan")
+tableOutput("catan")
 ```
 
 ### CTR
 
 ```{r ctr_results}
-dataTableOutput("ctr")
+tableOutput("ctr")
 ```
 
 ### Ticket to Ride
 
 ```{r ticket_to_ride_results}
-dataTableOutput("ticket_to_ride")
+tableOutput("ticket_to_ride")
 ```
 
 ### Rock Paper Scissors
 
 ```{r rps_results}
-dataTableOutput("rps")
+tableOutput("rps")
 ```

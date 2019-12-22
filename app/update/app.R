@@ -29,14 +29,14 @@ ui <- fluidPage(
                     div(style="display:flex", uiOutput("fifa_player_2"), uiOutput("fifa_score_2")),
                     actionButton("submit_fifa_results", label="Submit results", icon("refresh")),
                     hr(),
-                    dataTableOutput("fifa_results_table")
+                    tableOutput("fifa_results_table")
                 ),
                 tabPanel("Headers and Volleys",
                     img(src="headers_and_volleys.jpg", height="30%", width="30%", align = "top"),
                     uiOutput("headers_and_volleys_results_selector"),
                     actionButton("submit_headers_and_volleys_results", label="Submit results", icon("refresh")),
                     hr(),
-                    dataTableOutput("headers_and_volleys_results_table")
+                    tableOutput("headers_and_volleys_results_table")
                 ),
                 tabPanel("Catan",
                     img(src="catan.svg", height="15%", width="15%", align = "top"),
@@ -46,21 +46,21 @@ ui <- fluidPage(
                     ),
                     actionButton("submit_catan_results", label="Submit results", icon("refresh")),
                     hr(),
-                    dataTableOutput("catan_results_table")
+                    tableOutput("catan_results_table")
                 ),
                 tabPanel("CTR",
                     img(src="ctr.png", height="25%", width="25%", align = "top"),
                     uiOutput("ctr_results_selector"),
                     actionButton("submit_ctr_results", label="Submit results", icon("refresh")),
                     hr(),
-                    dataTableOutput("ctr_results_table")
+                    tableOutput("ctr_results_table")
                 ),
                 tabPanel("Ticket to Ride",
                     img(src="ticket_to_ride.jpg", height="30%", width="30%", align = "top"),
                     uiOutput("ticket_to_ride_results_selector"),
                     actionButton("submit_ticket_to_ride_results", label="Submit results", icon("refresh")),
                     hr(),
-                    dataTableOutput("ticket_to_ride_results_table")
+                    tableOutput("ticket_to_ride_results_table")
                 ),
                 tabPanel("Rock Paper Scissors",
                     img(src="rps.png", height="20%", width="20%", align = "top"),
@@ -68,7 +68,7 @@ ui <- fluidPage(
                     div(style="display:flex", uiOutput("rps_player_2"), uiOutput("rps_score_2")),
                     actionButton("submit_rps_results", label="Submit results", icon("refresh")),
                     hr(),
-                    dataTableOutput("rps_results_table")
+                    tableOutput("rps_results_table")
                 )
             )
         )
@@ -203,8 +203,8 @@ server <- function(input, output, session) {
     create_table <- function(game){
         # Creates results tables for each event
         vars <- games[[game]]
-        output[[paste0(vars$name, "_results_table")]] <- renderDataTable({
-            results[[vars$name]][event_id == input$selected_event][,-c("event_id")][order(-get(vars$order_cols))]
+        output[[paste0(vars$name, "_results_table")]] <- renderTable({
+            results[[vars$name]][event_id %in% input$selected_event][,-c("event_id")][order(-get(vars$order_cols))]
         })
     }
     
