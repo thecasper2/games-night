@@ -11,6 +11,7 @@ RUN R -e "install.packages(c('flexdashboard'), repos='http://cran.us.r-project.o
 RUN R -e "install.packages(c('ggplot2'), repos='http://cran.us.r-project.org')"
 RUN R -e "install.packages(c('RMySQL'), repos='http://cran.us.r-project.org')"
 RUN R -e "install.packages(c('shinyWidgets'), repos='http://cran.us.r-project.org')"
+RUN R -e "install.packages('writexl')
 RUN R -e "remove.packages(c('rmarkdown'))"
 RUN R -e "remotes::install_github('rstudio/rmarkdown')"
 

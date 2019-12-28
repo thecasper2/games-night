@@ -14,9 +14,42 @@ library(ggplot2)
 library(magrittr)
 library(RMySQL)
 library(shiny)
+library(writexl)
 
 games <- c("fifa", "rps", "headers_and_volleys", "ticket_to_ride", "catan", "ctr")
 source("get_data.R")
+```
+
+```{r output_results, message=FALSE, warning=FALSE, include=FALSE}
+lapply(games, function(game){
+    output[[game]] <- renderTable({
+        results[[game]][
+          df_players, on="player_id"][
+            event_id == input$selected_event][
+              order(-event_points)][
+                ,-c("event_id", "player_id", "first_name", "last_name")
+        ]
+    })
+})
+```
+
+```{r download_results}
+get_download_results <- reactive({
+    download_results <- lapply(games, function(game){
+        results[[game]][
+          df_players, on="player_id"][
+            event_id == input$selected_event][
+              order(-event_points)][
+                ,-c("event_id", "player_id", "first_name", "last_name")
+        ]
+    })
+    names(download_results) <- games
+    download_results$final_results <- final_results[,
+        .(event_points=sum(event_points)),
+        by=.(full_name)][order(-event_points)
+    ]
+    return(download_results)
+})
 ```
 
 
@@ -30,18 +63,20 @@ Sidebar {.sidebar}
 events_selector <- setNames(df_events$event_id, df_events$event_name)
 
 shiny::selectInput("selected_event", "Select event", choices = events_selector, multiple = FALSE)
+
+uiOutput("downloadUI")
+output$downloadUI <- renderUI( {
+  downloadButton("downBtn", "Download results", style = "width:100%;")
+})
+
+output$downBtn <- downloadHandler(
+  filename = function() { "results.xlsx"},
+  content = function(file) {write_xlsx(get_download_results(), path = file)}
+)
 ```
 
 Row {.tabset}
 -----------------------------------------------------------------------
-
-```{r output_results, message=FALSE, warning=FALSE, include=FALSE}
-lapply(games, function(game){
-    output[[game]] <- renderTable({
-        results[[game]][df_players, on="player_id"][event_id == input$selected_event][order(-event_points)][,-c("event_id", "player_id", "first_name", "last_name")]
-    })
-})
-```
 
 ### Overview
 
