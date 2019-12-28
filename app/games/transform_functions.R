@@ -21,9 +21,9 @@ head2head_results <- function(df_results, metric="goals"){
     )]
     results_table[, gd := gf - ga]
     results_table[,`:=` (
-        win = ifelse(gd > 0, 1, 0),
-        draw = ifelse(gd == 0, 1, 0),
-        loss = ifelse(gd < 0, 1, 0)
+        win = as.integer(ifelse(gd > 0, 1, 0)),
+        draw = as.integer(ifelse(gd == 0, 1, 0)),
+        loss = as.integer(ifelse(gd < 0, 1, 0))
     )]
     # Aggregate into results table
     results_table <- results_table[,
@@ -32,8 +32,11 @@ head2head_results <- function(df_results, metric="goals"){
         .SDcols=c("gf", "ga", "gd", "win", "draw", "loss")
     ]
     # Assign points
-    results_table[, points := (win*3) + draw]
-    results_table[, event_points := rank(points), by=.(event_id)]
+    results_table[, points := as.integer((win*3) + draw)]
+
+    results_table[, event_points := as.integer(rank(
+        points + (gd / 10000) + (gf / 100000)
+    )), by=.(event_id)] # Hack to order by gd and gf
     return(results_table[order(event_id, -points, -gd)])
 }
 

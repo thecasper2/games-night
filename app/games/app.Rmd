@@ -46,16 +46,18 @@ lapply(games, function(game){
 ### Overview
 
 ```{r final_results}
-output$final_results_plot <- renderPlot({
+output$final_results_plot <- plotly::renderPlotly({
     if(nrow(final_results) > 0){
         plot_data <- final_results[event_id == input$selected_event]
-        ggplot(plot_data, aes(x=full_name, y=event_points, fill=game_name)) +
+        g <- ggplot(plot_data, aes(x=full_name, y=event_points, fill=game_name)) +
             geom_bar(stat = "identity", position = "stack") +
             theme_bw() +
-            labs(x="Player", y="Points", fill="Game")
+            labs(x="Player", y="Points", fill="Game") +
+            scale_y_continuous(breaks = seq(0, 1000, by = 1))
+        plotly::ggplotly(g)
     }
 })
-plotOutput("final_results_plot")
+plotly::plotlyOutput("final_results_plot")
 ```
 
 
